@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.loveandheart.LH.dao.MenuDAO">
+<select id="getListMenu" parameterType="com.loveandheart.LH.vo.MenuListVO" resultType="com.loveandheart.LH.vo.MenuListVO">
+	<![CDATA[
+		SELECT a.HOME_ID,
+			   a.MENU_LEVEL,
+			   a.MENU_ID,
+			   a.MENU_NAME,
+			   a.LINK_PAGE,
+			   a.TOP_MENU_ID
+		FROM   TB_MENU a
+		WHERE  HOME_ID = #{home_id}
+		START WITH MENU_LEVEL = 1
+		CONNECT BY PRIOR MENU_ID = TOP_MENU_ID 
+  	]]>
+</select>
+<select id="getLayout" parameterType="com.loveandheart.LH.vo.LayoutVO" resultType="com.loveandheart.LH.vo.LayoutVO">
+	<![CDATA[
+	select  a.GALLARY_YN,
+			a.NOTICE_YN,
+			a.YOUTOBE_YN,
+			a.PAGE_VIEW_YN,
+			a.LINK_PAGE
+	from   TB_LAYOUT a
+	WHERE  a.HOME_ID = #{home_id}
+	 AND   a.MENU_ID = #{menu_id}
+  	]]>
+</select>
+<select id="getListGallery" parameterType="com.loveandheart.LH.vo.GalleryVO" resultType="com.loveandheart.LH.vo.GalleryVO">
+	<![CDATA[
+	SELECT
+	   GALLERY_TYPE,
+	   FULL_PATH,
+	   FILE_NAME
+	FROM  TB_GALLERY
+	WHERE HOME_ID = #{home_id}
+	  AND MENU_ID = #{menu_id}
+  	]]>
+</select>
+</mapper>

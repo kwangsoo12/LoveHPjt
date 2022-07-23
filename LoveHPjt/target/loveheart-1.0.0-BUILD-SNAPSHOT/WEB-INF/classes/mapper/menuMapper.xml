@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.loveandheart.LH.dao.MenuDAO">
+<select id="getBigMenu" resultType="com.loveandheart.LH.vo.WithJesusMenuVO">
+	<![CDATA[
+  		select church_number, church_menu_name, church_cate, church_cate1 
+  		from church_menu 
+  		where church_cate=0 
+  		order by church_number
+  	]]>
+</select>
+<select id="getSmallMenu" resultType="com.loveandheart.LH.vo.WithJesusMenuVO">
+	<![CDATA[
+  		select church_menu_name, church_number
+  		from church_menu
+  		where church_cate1=#{param}
+  		and church_cate=1
+  		order by church_number
+  	]]>
+</select>
+<select id="getCont" resultType="com.loveandheart.LH.vo.ContVO">
+	<![CDATA[
+  		select content,logo,picture,welcome_upper 
+  		from cont 
+  		where church_number = ${address}
+  	]]>
+</select>
+<select id="getNoticeMenu" resultType="com.loveandheart.LH.vo.NoticeVO">
+	<![CDATA[
+  		select notice_no, notice_title, notice_cont, to_char(write_date, 'YYYY-MM-DD')write_date 
+  		from notice_board 
+  		order by notice_no desc
+  	]]>
+</select>
+<select id="getOnlyCont" resultType="com.loveandheart.LH.vo.OnlyContVO">
+	<![CDATA[
+  		select notice_cont 
+  		from notice_board 
+  		where notice_no=${no}
+  	]]>
+</select>
+</mapper>

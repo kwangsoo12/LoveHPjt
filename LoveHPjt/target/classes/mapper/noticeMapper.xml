@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.loveandheart.LH.dao.NoticeDAO">
+<select id="getListNotice" parameterType="com.loveandheart.LH.vo.NoticeVO" resultType="com.loveandheart.LH.vo.NoticeVO">
+	<![CDATA[
+	SELECT
+	   SEQ,
+	   NOTICE_TITLE,
+	   NOTICE_CONTENT,
+	   WRITER,
+	   CREATE_DATE
+	FROM  TB_NOTICE
+	WHERE HOME_ID = #{home_id}
+	  AND MENU_ID = #{menu_id}
+	ORDER BY CREATE_DATE
+  	]]>
+</select>
+
+<select id="getListNoticeOrderSeq" parameterType="com.loveandheart.LH.vo.NoticeVO" resultType="com.loveandheart.LH.vo.NoticeVO">
+	<![CDATA[
+	SELECT 	   
+	    a.GALLERY_TYPE,
+		a.FULL_PATH,
+		a.FILE_NAME,
+		b.NOTICE_TITLE,
+		b.NOTICE_CONTENT,
+		b.LINK_PAGE
+	FROM  TB_GALLERY a,
+	      TB_NOTICE  b
+	WHERE a.HOME_ID = #{home_id}
+	  AND a.MENU_ID = #{menu_id}
+	  AND b.HOME_ID = a.HOME_ID
+	  AND b.MENU_ID = a.MENU_ID	
+	  AND b.SEQ = a.SEQ
+  	]]>
+</select>
+
+<select id="getPageListNotice" parameterType="com.loveandheart.LH.vo.NoticeVO" resultType="com.loveandheart.LH.vo.NoticeVO">
+	<![CDATA[
+	SELECT
+	    ROWPAGE,
+	    SEQ,
+		NOTICE_TITLE,
+		NOTICE_CONTENT,
+		WRITER,
+		CREATE_DATE
+	FROM (
+		SELECT
+		   TRUNC(ROWNUM / 8) + 1  ROWPAGE,
+		   SEQ,
+		   NOTICE_TITLE,
+		   NOTICE_CONTENT,
+		   WRITER,
+		   CREATE_DATE
+		FROM  TB_NOTICE
+		WHERE HOME_ID = #{home_id}
+		  AND MENU_ID = #{menu_id}
+          AND (#{search} = '1' OR (#{search} = 't' AND NOTICE_TITLE LIKE #{keyWord} || '%')
+                               OR (#{search} = 'c' AND NOTICE_CONTENT LIKE #{keyWord} || '%'))  
+		ORDER BY SEQ DESC)
+	WHERE ROWPAGE = #{pageNo}
+  	]]>
+</select>
+
+<select id="getNotice" parameterType="com.loveandheart.LH.vo.NoticeVO" resultType="com.loveandheart.LH.vo.NoticeVO">
+	<![CDATA[
+	SELECT
+		NOTICE_TITLE,
+		NOTICE_CONTENT,
+		LINK_PAGE
+	FROM TB_NOTICE
+	WHERE HOME_ID = #{home_id}
+      AND MENU_ID = #{menu_id}
+      AND SEQ = #{seq}
+  	]]>
+</select>
+<select id="listNotice" parameterType="com.loveandheart.LH.vo.NoticeVO" resultType="com.loveandheart.LH.vo.NoticeVO">
+	<![CDATA[
+	SELECT
+		NOTICE_TITLE,
+		NOTICE_CONTENT,
+		LINK_PAGE
+	FROM TB_NOTICE
+	WHERE HOME_ID = #{home_id}
+      AND MENU_ID = #{menu_id}
+  	]]>
+</select>
+
+<select id="getPageCount" parameterType="com.loveandheart.LH.vo.NoticeVO" resultType="com.loveandheart.LH.vo.NoticeVO">
+	<![CDATA[
+	SELECT
+		TRUNC(COUNT(*) / 8) + 1 CNT
+	FROM  TB_NOTICE
+	WHERE HOME_ID = #{home_id}
+	  AND MENU_ID = #{menu_id}
+      AND (#{search} = '1' OR (#{search} = 't' AND NOTICE_TITLE LIKE #{keyWord} || '%')
+                           OR (#{search} = 'c' AND NOTICE_CONTENT LIKE #{keyWord} || '%'))  
+	  
+  	]]>
+</select>
+<select id="insNotice" parameterType="com.loveandheart.LH.vo.NoticeVO" resultType="com.loveandheart.LH.vo.NoticeVO">
+	<![CDATA[
+		INSERT INTO TB_NOTICE (
+			HOME_ID,
+			MENU_ID,
+			SEQ,
+			NOTICE_TITLE,
+			NOTICE_CONTENT,
+			LINK_PAGE,
+			WRITER,
+			CREATE_DATE
+		) VALUES (
+			 #{home_id},
+			 #{menu_id},
+			 (SELECT NVL(MAX(SEQ) + 1,1) FROM TB_NOTICE WHERE HOME_ID = #{home_id} AND  MENU_ID = #{menu_id}),
+	  		 #{notice_title},	
+	  		 #{notice_content},	
+	  		 #{link_page},	
+	  		 '관리자',	
+	  		 (select to_char(sysdate,'YYYY.MM.DD') from dual)
+	   )
+  	]]>
+</select>
+<select id="updNotice" parameterType="com.loveandheart.LH.vo.NoticeVO" resultType="com.loveandheart.LH.vo.NoticeVO">
+	<![CDATA[
+		UPDATE TB_NOTICE 
+			SET NOTICE_TITLE = #{notice_title},
+			    NOTICE_CONTENT = #{notice_content},
+			    LINK_PAGE = #{link_page}
+	    WHERE HOME_ID = #{home_id}
+		  AND MENU_ID = #{menu_id}
+		  AND SEQ = #{seq}
+  	]]>
+</select>
+<select id="delNotice" parameterType="com.loveandheart.LH.vo.NoticeVO" resultType="com.loveandheart.LH.vo.NoticeVO">
+	<![CDATA[
+		DELETE FROM TB_NOTICE 
+	    WHERE HOME_ID = #{home_id}
+		  AND MENU_ID = #{menu_id}
+		  AND SEQ = #{seq}
+  	]]>
+</select>
+</mapper>

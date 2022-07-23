@@ -1,0 +1,431 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>LOVE & HEART</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript" src="js/jquery.youtube-background.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+<script >
+var bigMenuValue = 0;
+var bigNoArray = new Array();
+$( function() {////제이붜리
+//	$('.back_ground_video').hover(function(){ ///위
+	//	$(this).animate({opacity:'1'},600);
+//	$('.logo_div').css('display','none');
+//	},function(){
+//	$('.logo_div').css('display','block');
+//	});
+//	$("[data-youtube]").youtube_background();
+	
+	/* 커뮤니티 창 */
+	$('.community_div').children('span').click(function(){
+		let cd = $('.community_div').css('height');
+		if( cd == '30px'){
+			community_div_open();
+			$('.community_div').children('ul').css('display','block')
+		}else{
+			community_div_close();
+			$('.community_div').children('ul').css('display','none')
+		}
+	});
+	/*  커뮤니티 창*/
+	/*        메인버튼 색     */
+	$('.with_jesus').hover(function(){ ///위
+		$(this).css("background-color","white");
+		$(this).css("color","#2D3451");
+	},function(){
+		$(this).css("background-color","#2D3451");
+		$(this).css("color","white");
+	});
+	$('.love_heart').hover(function(){ ///아래
+		$(this).css("background-color","white");
+		$(this).css("color","#2D3451");
+	},function(){
+		$(this).css("background-color","#2D3451");
+		$(this).css("color","white");
+	});
+	/*        메인버튼색 끝      */
+	/*        큰 메뉴 시작      */
+	$('.with_jesus').click(function(){ 
+		console.log("test = "+bigMenuValue)
+		$('.put_ajax_menu').empty();
+		$.ajax({
+			url:"<%=request.getContextPath()%>/getBigMenu",
+			success:function(result){
+				r = $(result);
+				let bigMenuLi = '';
+				r.each(function(idx,vo){
+						
+						bigNoArray[idx] = vo.church_cate1;
+						bigMenuLi = '<ul class="big_ul'+vo.church_cate1+'">';
+						bigMenuLi += '<li class="big_li" value="'+vo.church_cate1+'" onclick="showSmallLi(this.value)"';
+						bigMenuLi += 'style="cursor:pointer;">';
+						bigMenuLi += vo.church_menu_name;
+						bigMenuLi += '</li>'
+						bigMenuLi += "</ul>";
+						
+						getSmallMenu(vo.church_cate1); //소메뉴 에이작스 무조건 실행 넣기
+						
+					$('.put_ajax_menu').append(bigMenuLi);
+				})
+				console.log(bigNoArray);
+			}
+		})
+	});     
+	/*        큰 메뉴 끝      */
+	/*       히든메뉴 슬라이드*/
+	$('.with_jesus').click(function(){ 
+		$('#hidden_menu_with').animate({width:'toggle'},200);
+	});
+	$('.hidden_menu_with_close').click(function(){
+		$('#hidden_menu_with').animate({width:'toggle'},200);
+	});
+	$('.love_heart').click(function(){
+		$('#hidden_menu_love').animate({width:'toggle'},200);
+	});
+	$('.hidden_menu_love_close').click(function(){
+		$('#hidden_menu_love').animate({width:'toggle'},200);
+	});
+	/*        메인 홈인포 아작스     */
+	$('.home_info_div').click(function(){
+		let hif = $(this).css('width');
+		let ss = $('.home_info_div');
+		
+		if(hif !== '200px'){
+			click_info_close();
+			ss.html('<span class="aspan2">HOME INFO</span>');
+		}else if(hif !== '100%'){
+			click_info_open();
+			
+			$.ajax({ //스트링 받아와 파싱
+				url:"<%=request.getContextPath()%>/getAddr",
+				success:function(result){
+					let data = JSON.parse(result);
+					
+					let addr = "<span class='aspan3'>";
+						addr += " - ";
+						addr += "주소 : "
+						addr += data.addr;
+						addr += " - ";
+						addr += "전화번호 : "
+						addr += data.phone;
+						addr += " - ";
+						addr += "운영시간 : "
+						addr += data.open;
+						addr += "</span>";
+						
+						ss.html(addr);
+				}
+			})
+		}
+	});
+	
+});/*     제이쿼리 끝   */
+/* 소메뉴 토글*/
+function showSmallLi(value){
+	console.log(value)
+$('.small_li'+value+'').toggle();
+}
+/* 소메뉴 토글 끝*/
+/*        소메뉴 에이작스 시작  */
+function getSmallMenu(church_no){
+	let params = {"no":church_no};
+	let smallMenuLi = '';
+	$.ajax({
+		url:"<%=request.getContextPath()%>/getSmallMenu",
+		data:params,
+		success:function(result){
+			let r = $(result);
+			
+			r.each(function(idx, vo){
+				smallMenuLi = "<li class='small_li"+church_no+"' value='"+church_no+"'" ;
+				smallMenuLi += "style='display:none; list-style-type:none; margin-left:20px;";
+				smallMenuLi += "color:gray; '>"
+				smallMenuLi += "<a href='<%=request.getContextPath()%>/smallPage?address="+vo.church_number+"' style='color:gray;'>"
+				smallMenuLi += vo.church_menu_name;
+				smallMenuLi += "</a>"
+				smallMenuLi += "</li>";
+			$('.big_ul'+church_no+'').append(smallMenuLi);
+			});
+		}
+	});
+};
+/*        소메뉴 에이작스 끝     */
+function click_show_ul(big){
+	let thisul = $(big).children('ul').css('display');
+	if(thisul !== 'none'){
+		$(big).children('ul').css('display','none');
+	}else if(thisul !== 'block'){
+		$(big).children('ul').css('display','block');
+	}
+}
+/*     홈인포    */
+function click_info_open(){
+	$('.home_info_div').css('width','100%');
+};
+function click_info_close(){
+	$('.home_info_div').css('width','200px');
+};
+function community_div_open(){
+	$('.community_div').css('height','150px');
+}
+function community_div_close(){
+	$('.community_div').css('height','30px');
+}
+/*        홈인포 끝   */
+</script>
+<style>
+*{
+	font-family:'Noto Sans KR';
+}
+ul, a, p{
+	margin:0;
+	padding:0;
+}
+a{
+	text-decoration: none;
+}
+html, body{
+	overflow: hidden;
+	margin:0;
+	padding:0;
+	height:100%;
+}
+.container{background-color:;
+	width:1920px;
+	height:1080px;
+	margin:0 auto;
+	
+}
+.top_div{
+	left:0;
+	top:0;
+	position: absolute;
+	background-color: white;
+	box-sizing:border-box;
+	width:15%;
+	height:100%;
+	display: none;
+	border-right: 5px solid gray;
+	overflow:auto;
+	overflow-x:hidden;
+	z-index: 1;
+}
+#hidden_menu_with{
+	
+}
+.church_logo{background-color:;
+	width:100px;
+	height:100px;
+	margin:0 auto;
+	margin-top:20px;
+}
+.church_logo>a, .church_logo>a>img{
+	width: 100%;
+}
+.with_menu_div{/* 메뉴 백그라운드*/background-color:;
+	border-top: 3px solid gray;
+	width:200px;
+	height: 80%;
+	margin:0 auto;
+	margin-top:10px;
+}
+.put_ajax_menu{ /*상위 메뉴 li*/
+	margin-top:10px;
+	font-weight: 600;
+	
+}
+.big_li{
+	color:#232223;
+	list-style-type: none;
+	font-size: 1.2em;
+}
+#hidden_menu_love{
+	width:15%;
+	height:100%;
+	display: none;
+	border-right: 5px solid gray;
+}
+#show_hidden_menu_with_button{
+	position: absolute;
+	left:0;
+	top:17%;
+}
+.with_jesus{
+	font-size:1.2em;
+}
+.love_heart{
+	margin:10px 0 0 0;
+	font-size:1.2em;
+}
+.with_jesus, .love_heart{
+	width: 50px;
+	height: 300px;
+	font-weight: 400;
+	color:white;
+	cursor: pointer;
+	opacity: 0.5;
+	border-radius:0 8px 8px 0; 
+	background-color:#2D3451;
+	writing-mode: vertical-rl;
+	text-align: center;
+	line-height: 40px;
+	z-index: 0.9;
+}
+.back_ground_video{
+	height:100%;
+	width: 100%;
+	opacity: 0.3;
+	z-index: -1;
+}
+.video_info{
+	position:absolute;
+	top:85%;
+	right:0%;
+	width:200px;
+	height:60px;
+	background-color: black;
+	opacity: 0.5;
+	border-radius: 8px 0 0 8px;
+	padding: 0 0 0 10px ;
+	
+}
+.video_info>a>img{
+	height:100%;
+	float: left;
+}
+.aspan{
+	font-size: 1.2em;
+	font-weight: 400;
+	color: white;
+	float: left;
+	margin: 0 0 0 10px;
+}
+
+.aspan2{
+	font-size: 1.2em;
+	font-weight: 400;
+	color: white;
+	float: right;
+	margin: 10px 20px 0 0;
+	line-height: 30px;
+}
+.aspan3{ /* 데이터 베이스 넣을때 태그 */
+	font-size: 1.2em;
+	font-weight: 400;
+	color: white;
+	float: right;
+	line-height: 60px;
+	margin-right: 28%;
+}
+.hidden_menu_with_close, .hidden_menu_love_close{
+	width:40px;
+	height: 80px;
+	background-color:white;
+	position:absolute;
+	top:47%;
+	left:90%;
+	cursor: pointer;
+}
+.hidden_menu_with_close>img, .hidden_menu_love_close>img{
+	margin-top:25px;
+}
+.logo_div {
+	position:absolute;
+	top:35%;
+	left:30%;
+	width:35%;
+	height: 25%;
+	text-align: center;
+	border-radius: 15px;
+}
+.home_info_div{
+	position:absolute;
+	top:92%;
+	right:0%;
+	width:200px;
+	height:60px;
+	background-color: black;
+	opacity: 0.5;
+	border-radius: 8px 0 0 8px;
+	padding: 0 0 0 10px ;
+	cursor: pointer;
+}
+.community_div{
+	background-color: black;
+	width:100%;
+	height: 30px;
+	position: absolute;
+	bottom: 0;
+	opacity: 0.5;
+	color:white;
+	text-align: center;
+}
+.community_div>span{
+	cursor: pointer;
+}
+.community_div>ul{background-color:;
+	display: none;
+	color:white;
+	width:50%;
+	margin-left:25%; 
+}
+.community_div a{
+	color:white;
+}
+</style>
+</head>
+<body>
+<!-- 컨테이너 -->
+<!-- 배경 동영상 데이터 베이스 URL -->
+
+<div class="container"> 
+<div id="hidden_menu_with" class="top_div">
+	<div class="church_logo">
+		<a href="<%=request.getContextPath()%>/"><img src="resources/img/with.png"></a>
+	</div>
+	<div class="hidden_menu_with_close">
+		<img src="resources/img/closeB.png">
+	</div>
+	<div class="with_menu_div">
+		<div class="put_ajax_menu">
+		<ul >
+		</ul>
+		</div>
+	</div>
+	<div class="community_div">
+		<span>COMMUNITY</span>
+		<ul>
+			<li><a href="<%=request.getContextPath()%>/smallPage?address=100">NOTICE</a></li> <!-- notice = 100 -->
+			<li><a href="<%=request.getContextPath()%>/smallPage?address=101">자주하시는 질문</a></li>
+			<li><a href="<%=request.getContextPath()%>/smallPage?address=102">오시는 길</a></li>
+		</ul>
+	</div>
+</div>
+
+<div id="hidden_menu_love" class="top_div">
+	<div class="hidden_menu_love_close"><img src="resources/img/closeB.png"></div>
+</div>
+
+<div id="show_hidden_menu_with_button">
+	
+	<div class="with_jesus">
+		<span>CHURCH WITH JESUS</span>	
+	</div>
+	<div class="love_heart">
+		<span>LOVE & HEART </span>
+	</div>
+</div>
+
+
+
+
+
