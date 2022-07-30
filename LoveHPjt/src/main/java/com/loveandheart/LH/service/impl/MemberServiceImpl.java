@@ -63,9 +63,6 @@ public class MemberServiceImpl implements MemberService {
 	public MemberVO getIdMember(MemberVO inVO) {
 		MemberVO outVO = null;
 		try {
-			System.out.println(inVO.getPassword());
-			System.out.println(inVO.getName());
-			System.out.println(inVO.getPhone_no());
 			outVO = memberDao.getIdMember(inVO);
 			outVO.setStatCode("0000"); // 정상적으로 로그인 되었습니다.
 		} catch (Exception e) {
